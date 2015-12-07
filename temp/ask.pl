@@ -5,15 +5,12 @@
 ask_KB(Action) :- make_action_query(Strategy,Action).
 
 make_action_query(Strategy,Action) :- act(strategy_reflex,Action),!.
-make_action_query(Strategy,Action) :- act(strategy_find_out_good,Action),!.
 make_action_query(Strategy,Action) :- act(strategy_kill_wumpus,Action),!.
 make_action_query(Strategy,Action) :- act(strategy_find_out,Action),!.
 make_action_query(Strategy,Action) :- act(strategy_go_out,Action),!.
 
 
 % Strategy Reflex
-
-% Moved shoot to strategy_kill_wumpus
 
 act(strategy_reflex,rebound) :-		% back at the last location
 	agent_location(L),
@@ -39,6 +36,30 @@ act(strategy_reflex,die) :-
 	format("Reflex strategy - die (pit), ",[]), 
 	!.
 
+act(strategy_reflex,shoot) :-		% I shoot Wumpus only if I think
+	agent_arrows(1),		% that we are in the same X
+	agent_location([X,Y]),		% it means I assume Wumpus and me
+	location_ahead([X,NY]),
+	is_wumpus(yes,[X,WY]),		% are in the same column
+	dist(NY,WY,R1),			% And If I don't give him my back...
+	dist(Y,WY,R2),			% <=> If I'm in the good orientation
+	inf_equal(R1,R2),		% to shoot him... HE!HE!
+	is_short_goal(shoot_forward_in_the_same_X),
+	format("Reflex strategy - shoot, ",[]), 
+	!.
+
+act(strategy_reflex,shoot) :-		% I shoot Wumpus only if I think
+	agent_arrows(1),		% that we are in the same y
+	agent_location([X,Y]),
+	location_ahead([NX,Y]),
+	is_wumpus(yes,[WX,Y]),
+	dist(NX,WX,R1),			% And If I don't give him my back...
+	dist(X,WX,R2),
+	inf_equal(R1,R2),
+	is_short_goal(shoot_forward_in_the_same_Y),
+	format("Reflex strategy - shoot, ",[]), 
+	!.
+
 act(strategy_reflex,grab) :-
 	agent_location(L),
 	is_gold(L),
@@ -58,46 +79,6 @@ act(strategy_reflex,climb) :-		% climb with gold
 
 % And there is a good room adjacent
 
-act(strategy_find_out_good,forward) :-
-	agent_goal(find_out),
-	agent_courage,
-	good(_),			% I'm interested by a good somewhere
-	location_ahead(L),		% this somewhere is just
-	good(L),			% the room in front of me.
-	no(is_wall(L)),
-	is_short_goal(find_out_forward_good_good),
-	format("Find out strategy, ",[]),
-	!.
-
-act(strategy_find_out_good,turnleft) :-
-	agent_goal(find_out),
-	agent_courage,
-	good(_),			% I'm interested,...
-	agent_orientation(O),
-	Planned_O is (O+90) mod 360,
-	agent_location(L),
-	location_toward(L,Planned_O,Planned_L),
-	good(Planned_L),		% directly by my left side.
-	no(is_wall(Planned_L)),
-	is_short_goal(find_out_turnleft_good_good),
-	format("Find out strategy, ",[]),
-	!.
-
-act(strategy_find_out_good,turnright) :-
-	agent_goal(find_out),
-	agent_courage,
-	good(_),			% I'm interested,
-	agent_orientation(O),
-	Planned_O is abs(O-90) mod 360,
-	agent_location(L),
-	location_toward(L,Planned_O,Planned_L),
-	good(Planned_L),		% directly by my right side.
-	no(is_wall(Planned_L)),
-	is_short_goal(find_out_turnright_good_good),
-	format("Find out strategy, ",[]),
-	!.
-
-% We have to kill wumpus if there is no good rooms
 
 act(strategy_kill_wumpus,turnleft) :-		% I shoot Wumpus only if I think
 	agent_arrows(1),		% that we are in the same X
@@ -107,16 +88,16 @@ act(strategy_kill_wumpus,turnleft) :-		% I shoot Wumpus only if I think
 	%dist(NY,WY,R1),			% And If I don't give him my back...
 	%dist(Y,WY,R2),			% <=> If I'm in the good orientation
 	%inf_equal(R1,R2),		% to shoot him... HE!HE!
-
 	agent_orientation(O),
 	Planned_O is (O+90) mod 360,	% my leftside can help me :
 	agent_location(L),
 	location_toward(L,Planned_O,Planned_L),
 	no(is_wall(L)),
 	is_wumpus(yes, Planned_L),
+	no(is_dead),
 	%is_short_goal(shoot_forward_in_the_same_X),
-	is_short_goal(find_out_forward_risky),
-	format("Strategy kill Wumpus, ",[]),
+	is_short_goal(find_out_forward__risky),
+	format("MyStrategy, ",[]),
 	!.
 
 act(strategy_kill_wumpus,turnright) :-		% I shoot Wumpus only if I think
@@ -134,40 +115,65 @@ act(strategy_kill_wumpus,turnright) :-		% I shoot Wumpus only if I think
 	location_toward(L,Planned_O,Planned_L),
 	no(is_wall(L)),
 	is_wumpus(yes, [Planned_L]),
-	is_short_goal(find_out_forward_risky),
-	format("Kill Wumpus, ",[]),
+	no(is_dead),
+	is_short_goal(find_out_forward__risky),
+	format("MyStrategy2, ",[]),
 	!.
 
-% Shooting is a strategy, not a reflex
-act(strategy_kill_wumpus,shoot) :-		% I shoot Wumpus only if I think
-	agent_arrows(1),		% that we are in the same X
-	agent_location([X,Y]),		% it means I assume Wumpus and me
-	location_ahead([X,NY]),
-	is_wumpus(yes,[X,WY]),		% are in the same column
-	dist(NY,WY,R1),			% And If I don't give him my back...
-	dist(Y,WY,R2),			% <=> If I'm in the good orientation
-	inf_equal(R1,R2),		% to shoot him... HE!HE!
-	is_short_goal(shoot_forward_in_the_same_X),
-	format("Kill Wumpus - shoot, ",[]), 
+/*act(strategy_find_out,forward) :-
+	agent_goal(find_out),
+	agent_courage,
+	good(_),			% I'm interested by a good somewhere
+	location_ahead(L),		% this somewhere is just
+	good(L),			% the room in front of me.
+	no(is_wall(L)),
+	is_dead,
+	is_short_goal(find_out_forward__deadly),
+	format("MyStrategy3, ",[]),
+	!.*/
+
+act(strategy_find_out,forward) :-
+	agent_goal(find_out),
+	agent_courage,
+	good(_),			% I'm interested by a good somewhere
+	location_ahead(L),		% this somewhere is just
+	good(L),			% the room in front of me.
+	no(is_wall(L)),
+	is_short_goal(find_out_forward_good_good),
+	format("Find out strategy, ",[]),
 	!.
 
-act(strategy_kill_wumpus,shoot) :-		% I shoot Wumpus only if I think
-	agent_arrows(1),		% that we are in the same y
-	agent_location([X,Y]),
-	location_ahead([NX,Y]),
-	is_wumpus(yes,[WX,Y]),
-	dist(NX,WX,R1),			% And If I don't give him my back...
-	dist(X,WX,R2),
-	inf_equal(R1,R2),
-	is_short_goal(shoot_forward_in_the_same_Y),
-	format("Kill Wumpus - shoot, ",[]), 
+act(strategy_find_out,turnleft) :-
+	agent_goal(find_out),
+	agent_courage,
+	good(_),			% I'm interested,...
+	agent_orientation(O),
+	Planned_O is (O+90) mod 360,
+	agent_location(L),
+	location_toward(L,Planned_O,Planned_L),
+	good(Planned_L),		% directly by my left side.
+	no(is_wall(Planned_L)),
+	is_short_goal(find_out_turnleft_good_good),
+	format("Find out strategy, ",[]),
+	!.
+
+act(strategy_find_out,turnright) :-
+	agent_goal(find_out),
+	agent_courage,
+	good(_),			% I'm interested,
+	agent_orientation(O),
+	Planned_O is abs(O-90) mod 360,
+	agent_location(L),
+	location_toward(L,Planned_O,Planned_L),
+	good(Planned_L),		% directly by my right side.
+	no(is_wall(Planned_L)),
+	is_short_goal(find_out_turnright_good_good),
+	format("Find out strategy, ",[]),
 	!.
 
 % And there is a good room but not adjacent
 %
 %
-
-% We look for medium if we did not kill Wumpus, otherwise, we can be risky
 
 act(strategy_find_out,forward) :-
 	agent_goal(find_out),
@@ -177,7 +183,6 @@ act(strategy_find_out,forward) :-
 	medium(L),			% I use medium room to go to
 	no(is_wall(L)),
 	is_short_goal(find_out_forward_good_medium),
-	no(is_dead),
 	format("Find out strategy, ",[]),
 	!.
 
@@ -193,7 +198,6 @@ act(strategy_find_out,turnleft) :-
 	no(is_wall(Planned_L)),
 	is_short_goal(find_out_turnleft_good_medium),
 	format("Find out strategy - medium, ",[]),
-	no(is_dead),
 	!.
 
 act(strategy_find_out,turnright) :-
@@ -208,7 +212,6 @@ act(strategy_find_out,turnright) :-
 	no(is_wall(Planned_L)),
 	is_short_goal(find_out_turnright_good_medium),
 	format("Find out strategy - medium, ",[]),
-	no(is_dead),
 	!.
 
 act(strategy_find_out,turnleft) :-	% I want to change completely
@@ -216,9 +219,9 @@ act(strategy_find_out,turnleft) :-	% I want to change completely
 	agent_courage,
 	good(_),			% while I don't find it, I look for
 	is_short_goal(find_out_180_good_),
-	format("Find out strategy - medium, ",[]),
 	no(is_dead),
-	!.
+	format("Find out strategy, ",[]),!.
+
 
 % I'm not tired but nowhere is good room and my goal is always find gold
 % So I'm testing risky and deadly room...

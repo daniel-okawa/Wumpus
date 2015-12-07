@@ -54,7 +54,7 @@ initialize_land(test):-
 	retractall(gold_location(_)),
 	retractall(pit_location(_)),
 	assert(land_extent(5)),
-	% caso 0
+	% caso 1
 	/*assert(wumpus_location([3,2])),
 	assert(wumpus_healthy),
 	assert(gold_location([4,3])),
@@ -62,13 +62,62 @@ initialize_land(test):-
 	assert(pit_location([4,4])),
 	assert(pit_location([3,1])).*/
 
-	%caso 1
-	assert(wumpus_location([4,2])),
+	% caso 2
+	/*assert(wumpus_location([4,4])),
+	assert(wumpus_healthy),
+	assert(gold_location([1,2])),
+	assert(pit_location([2,2])),
+	assert(pit_location([3,2])).*/
+
+	% caso 3
+	/*assert(wumpus_location([1,2])),
+	assert(wumpus_healthy),
+	assert(gold_location([4,4])),
+	assert(pit_location([4,1])),
+	assert(pit_location([4,3])),
+	assert(pit_location([3,3])),
+	assert(pit_location([3,4])).*/
+
+	% caso 4
+	/*assert(wumpus_location([1,3])),
+	assert(wumpus_healthy),
+	assert(gold_location([4,4])),
+	assert(pit_location([4,1])),
+	assert(pit_location([4,3])),
+	assert(pit_location([3,3])).*/
+
+	% caso 5
+	/*assert(wumpus_location([4,2])),
 	assert(wumpus_healthy),
 	assert(gold_location([4,1])),
 	assert(pit_location([3,1])),
 	assert(pit_location([3,2])),
-	assert(pit_location([3,3])).
+	assert(pit_location([3,3])).*/
+
+
+	% caso 1
+	/*assert(wumpus_location([1,3])),
+	assert(wumpus_healthy),
+	assert(gold_location([3,4])),
+	assert(pit_location([3,3])),
+	assert(pit_location([3,1])),
+	assert(pit_location([4,4])).*/
+
+	% caso 2
+	assert(wumpus_location([1,3])),
+	assert(wumpus_healthy),
+	assert(gold_location([4,4])),
+	assert(pit_location([3,3])),
+	assert(pit_location([3,4])),
+	assert(pit_location([4,3])).
+
+	% caso 3
+	/*assert(wumpus_location([3,2])),
+	assert(wumpus_healthy),
+	assert(gold_location([4,3])),
+	assert(pit_location([3,3])),
+	assert(pit_location([4,4])),
+	assert(pit_location([3,1])).*/
 
 % create an agent with the initial features described in the section 6.2
 initialize_agent(fig62):-	

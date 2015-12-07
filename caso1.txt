@@ -1,0 +1,33 @@
+the game is begun.
+| -> Agent health : perfect_health
+| -> Wumpus Health : alive
+| -> Time : 0
+| -> Number of visited room : 0
+| -> Number of total room : 16
+| -> Score : 0
+| -> Gold : not_found
+| -> Strategy Goal : find_out
+| -> Body agent is : in_the_cave
+I'm conquering the World Ah!Ah!...
+>I'm in [1,1], turned to east, I feel [no,no,no,no,no], Find out strategy, I'm doing : forward
+>I'm in [2,1], turned to east, I feel [no,no,no,no,no], Find out strategy, I'm doing : forward
+>I'm in [3,1], turned to east, I feel [no,no,no,no,no], Find out strategy, I'm doing : forward
+>I'm in [4,1], turned to east, I feel [no,yes,yes,no,no], Reflex strategy - grab, I'm doing : grab
+Yomi! Yomi! Give me the money >=}...
+>I'm in [4,1], turned to east, I feel [no,yes,no,no,no], I'm doing : turnleft
+>I'm in [4,1], turned to north, I feel [no,yes,no,no,no], Go out strategy, I'm doing : turnleft
+>I'm in [4,1], turned to west, I feel [no,yes,no,no,no], Find out strategy - deadly, I'm doing : forward
+>I'm in [3,1], turned to west, I feel [no,no,no,no,no], Find out strategy - deadly, I'm doing : forward
+>I'm in [2,1], turned to west, I feel [no,no,no,no,no], Find out strategy - deadly, I'm doing : forward
+>I'm in [1,1], turned to west, I feel [no,no,no,no,no], Reflex strategy - climb, I'm doing : climb
+the game is finished.
+| -> Agent health : perfect_health
+| -> Wumpus Health : alive
+| -> Time : 10
+| -> Number of visited room : 4
+| -> Number of total room : 16
+| -> Score : 990
+| -> Gold : with_me
+| -> Strategy Goal : go_out
+| -> Body agent is : out_the_cave
+=) Pfftt too easy
